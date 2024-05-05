@@ -118,4 +118,12 @@
 ; - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ; Exercise 321
 
-; ...
+; An [S-expr X] is one of: 
+; – X
+; – [SL X]
+
+; An [SL X] is one of:
+; – '()
+; – (cons S-expr [SL X])
+
+; where X is any kind of atom

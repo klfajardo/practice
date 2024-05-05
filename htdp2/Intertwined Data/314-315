@@ -1,0 +1,58 @@
+continuation from exercises previous chapter (310-313)
+; - - - 
+
+; An FF (short for family forest) is one of: 
+; – '()
+; – (cons FT FF)
+; interpretation a family forest represents several
+; families (say, a town) and their ancestor trees
+
+(define ff1 (list Carl Bettina))
+(define ff2 (list Fred Eva))
+(define ff3 (list Fred Eva Carl))
+
+; FF -> Boolean
+; does the forest contain any child with "blue" eyes
+ 
+(check-expect (blue-eyed-child-in-forest? ff1) #false)
+(check-expect (blue-eyed-child-in-forest? ff2) #true)
+(check-expect (blue-eyed-child-in-forest? ff3) #true)
+ 
+(define (blue-eyed-child-in-forest? a-forest)
+  (cond
+    [(empty? a-forest) #false]
+    [else
+     (or (blue-eyed-child? (first a-forest))
+         (blue-eyed-child-in-forest? (rest a-forest)))]))
+
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+; Exercise 314
+
+; A [List-of FT] is one of:
+; - '()
+; - (cons FT [List-of FT])
+
+; An FF (short for family forest) is defined as: 
+; – [List-of FT]
+; interpretation: a family forest represents several
+; families (say, a town) and their ancestor trees
+
+; FF -> Boolean
+; does the forest contain any child with "blue" eyes
+(check-expect (blue-eyed-child-in-forest?.v2 ff1) #false)
+(check-expect (blue-eyed-child-in-forest?.v2 ff2) #true)
+(check-expect (blue-eyed-child-in-forest?.v2 ff3) #true)
+(define (blue-eyed-child-in-forest?.v2 a-forest)
+     (ormap blue-eyed-child? a-forest))
+
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+; Exercise 315
+
+; FF -> Number
+; produces the average age of all child structures in the family forest.
+(check-expect (average-age-forest ff1 2024) 49)
+(check-expect (average-age-forest ff2 2024) 14.5)
+(check-expect (average-age-forest ff3 2024) 11.6)
+(define (average-age-forest a-forest current-year)
+  (/ (foldr (lambda (x y) (+ (sum-age x current-year))) 0 a-forest)
+     (foldr (lambda (x y) (+ (count-persons x) y)) 0 a-forest)))

@@ -1,1 +1,96 @@
+(define-struct no-parent [])
+(define-struct child [father mother name date eyes])
+; An FT (short for family tree) is one of: 
+; – (make-no-parent)
+; – (make-child FT FT String N String)
 
+(define NP (make-no-parent))
+; An FT is one of: 
+; – NP
+; – (make-child FT FT String N String)
+
+; Oldest Generation:
+(define Carl (make-child NP NP "Carl" 1926 "green"))
+(define Bettina (make-child NP NP "Bettina" 1926 "green"))
+ 
+; Middle Generation:
+(define Adam (make-child Carl Bettina "Adam" 1950 "hazel"))
+(define Dave (make-child Carl Bettina "Dave" 1955 "black"))
+(define Eva (make-child Carl Bettina "Eva" 1965 "blue"))
+(define Fred (make-child NP NP "Fred" 1966 "pink"))
+ 
+; Youngest Generation: 
+(define Gustav (make-child Fred Eva "Gustav" 1988 "brown"))
+
+; FT -> Boolean
+; does an-ftree contain a child
+; structure with "blue" in the eyes field
+(check-expect (blue-eyed-child? Carl) #false)
+(check-expect (blue-eyed-child? Gustav) #true)
+(define (blue-eyed-child? an-ftree)
+  (cond
+    [(no-parent? an-ftree) #false]
+    [else (or (string=? (child-eyes an-ftree) "blue")
+              (blue-eyed-child? (child-father an-ftree))
+              (blue-eyed-child? (child-mother an-ftree)))]))
+
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+; Exercise 310
+
+; FT -> Number
+; counts the number of childs in the tree
+(check-expect (count-persons Carl) 1)
+(check-expect (count-persons Gustav) 5)
+(define (count-persons an-ftree)
+  (cond
+    [(no-parent? an-ftree) 0]
+    [else
+     (+ (count-persons (child-father an-ftree))
+        (count-persons (child-mother an-ftree)) 1)]))
+
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+; Exercise 311
+
+; FT Date -> Number
+; produces the average age of all child structures in the family tree.
+(check-expect (average-age Gustav 2024) 69.8)
+(define (sum-age an-ftree current-year)
+  (cond
+    [(no-parent? an-ftree) 0]
+    [else
+     (local
+       ((define difference (- current-year (child-date an-ftree))))
+       (+ difference (sum-age (child-father an-ftree) current-year)
+             (sum-age (child-mother an-ftree) current-year)))]))
+
+(define (average-age an-ftree current-year)
+  (/ (sum-age an-ftree current-year) (count-persons an-ftree)))
+
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+; Exercise 312
+
+; FT -> List-of [child-eyes]
+; produces a list of all eye colors in the tree
+(check-expect (eye-colors Gustav) (shared ((-7- "green")) (list "brown" "pink" "blue" -7- -7-)))
+(define (eye-colors an-ftree)
+  (cond
+   [(no-parent? an-ftree) '()]
+   [else
+     (cons (child-eyes an-ftree)
+           (append (eye-colors (child-father an-ftree))
+                   (eye-colors (child-mother an-ftree))))]))
+
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+; Exercise 313
+
+; FT -> Boolean
+; does an ancestor in the given an-ftree contain a
+; child structure with "blue" in the eyes field?
+(check-expect (blue-eyed-ancestor? Eva) #false)
+(check-expect (blue-eyed-ancestor? Gustav) #true)
+(define (blue-eyed-ancestor? an-ftree)
+  (cond
+    [(no-parent? an-ftree) #false]
+    [else
+     (or (blue-eyed-child? (child-father an-ftree))
+         (blue-eyed-child? (child-mother an-ftree)))]))

@@ -1,0 +1,121 @@
+; An S-expr is one of: 
+; – Atom
+; – SL
+
+; An SL is one of:
+; – '()
+; – (cons S-expr SL)
+
+; An Atom is one of:
+; – Number
+; – String
+; – Symbol
+
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+; Exercise 316
+
+; Any -> Boolean
+; produces #true if x is atom.
+(define (atom? x)
+  (cond
+    [(number? x) #true]
+    [(string? x) #true]
+    [(symbol? x) #true]
+    [else #false]))
+
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+; Exercise 317
+
+; S-expr Symbol -> N 
+; counts all occurrences of sy in sexp 
+(define (count sexp sy)
+  (local
+    (; SL Symbol -> N 
+     ; counts all occurrences of sy in sl 
+     (define (count-sl sl sy)
+       (cond
+         [(empty? sl) 0]
+         [else
+          (+ (count (first sl) sy) (count-sl (rest sl) sy))]))
+     ; Atom Symbol -> N 
+     ; counts all occurrences of sy in at 
+     (define (count-atom at sy)
+       (cond
+         [(number? at) 0]
+         [(string? at) 0]
+         [(symbol? at) (if (symbol=? at sy) 1 0)])))
+    (cond
+      [(atom? sexp) (count-atom sexp sy)]
+      [else (count-sl sexp sy)])))
+
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+; Exercise 318
+
+; S-exp -> Number
+; Determines the depth of S-exp
+(check-expect (depth 'hola) 1)
+(check-expect (depth (list 'hola 'hola)) 2)
+(check-expect (depth (list 1)) 2)
+(check-expect (depth '(1 (2 3) 4)) 3)
+(define (depth s-exp)
+  (cond
+    [(empty? s-exp) 1]
+    [(atom? s-exp) 1]
+    [else
+     (+ (apply max (map depth s-exp)) 1)]))
+
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+; Exercise 319
+
+; Replaces all ocurrences of old with new in s-exp
+(check-expect (substitute (list "hola" "como" "estas") "estas" "vas") (list "hola" "como" "vas"))
+(check-expect (substitute '(a (b a) (c d a)) 'a 'x) '(x (b x) (c d x)))
+(define (substitute s-exp old new)
+  (cond
+    [(empty? s-exp) '()]
+    [(atom? s-exp) (if (equal? s-exp old) new s-exp)]
+    [else (cons (substitute (first s-exp) old new) (substitute (rest s-exp) old new))]))
+
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+; Exercise 320
+
+; An S-expr is one of: 
+; - Number
+; - String
+; - Symbol
+; – [List-of S-expr]
+
+; A [List-of S-expr] is one of:
+; - '()
+; - (cons S-expr [List-of S-expr])
+
+; S-expr Symbol -> N 
+; counts all occurrences of sy in sexp
+(check-expect (count.v2 'world 'hello) 0)
+(check-expect (count.v2 '(world hello) 'hello) 1)
+(define (count.v2 sexp sy)
+    (cond
+      [(atom? sexp) (if (and (symbol? sexp) (symbol=? sexp sy)) 1 0)]
+      [(empty? sexp) 0]
+      [else
+       (+ (count.v2 (first sexp) sy) (count.v2 (rest sexp) sy))]))
+
+; S-expr Symbol -> N 
+; counts all occurrences of sy in sexp
+(check-expect (count.v3 'world 'hello) 0)
+(check-expect (count.v3 '(world hello) 'hello) 1)
+(define (count.v3 sexp sy)
+    (cond
+      [(atom? sexp) (if (and (symbol? sexp) (symbol=? sexp sy)) 1 0)]
+      [(empty? sexp) 0]
+      [else
+       (apply + (map (lambda (x) (count.v3 x sy)) sexp))])) 
+
+; map devuelve una lista
+; apply junto con + para sumar los elementos de la lista resultante
+; es apply valido en este punto del libro? not sure -> si no, alternativa seria remplazar apply con foldr
+
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+; Exercise 321
+
+; ...

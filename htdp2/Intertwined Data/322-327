@@ -1,0 +1,136 @@
+(define-struct no-info [])
+(define NONE (make-no-info))
+ 
+(define-struct node [ssn name left right])
+; A BT (short for BinaryTree) is one of:
+; – NONE
+; – (make-node Number Symbol BT BT)
+
+; Two binary trees
+(define bt1 (make-node
+             15
+             'd
+             NONE
+             (make-node
+              24 'i NONE NONE)))	
+(define bt2 (make-node
+             15
+             'd
+             (make-node
+              87 'h NONE NONE)
+             NONE))
+
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+; Exercise 322
+
+; Number BinaryTree -> Boolean
+; determines whether a given number occurs in some given BT
+(check-expect (contains-bt? 24 bt1) #true)
+(check-expect (contains-bt? 15 bt2) #true)
+(check-expect (contains-bt? 30 bt1) #false)
+(define (contains-bt? n bt)
+  (cond
+    [(no-info? bt) #false]
+    [else (or
+           (equal? n (node-ssn bt))
+           (contains-bt? n (node-left bt))
+           (contains-bt? n (node-right bt)))]))
+
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+; Exercise 323
+
+; Number BinaryTree -> String
+; determines whether a given number occurs in some given BT and returns the node's name
+(check-expect (search-bt 24 bt1) 'i)
+(check-expect (search-bt 15 bt2) 'd)
+(check-expect (search-bt 30 bt1) #false)
+(define (search-bt n bt)
+  (cond
+    [(no-info? bt) #false]
+    [(equal? n (node-ssn bt)) (node-name bt)]
+    [else
+     (if (contains-bt? n (node-left bt))
+         (search-bt n (node-left bt))
+         (search-bt n (node-right bt)))]))
+
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+; Exercise 324
+
+; The BST Invariant
+; A BST (short for binary search tree) is a BT according to the following conditions:
+; - NONE is always a BST.
+; - (make-node ssn0 name0 L R) is a BST if
+; - - L is a BST,
+; - - R is a BST,
+; - - all ssn fields in L are smaller than ssn0,
+; - - all ssn fields in R are larger than ssn0.
+
+; BinaryTree -> List
+(check-expect (inorder bt1) (list 15 24))
+(check-expect (inorder bt2) (list 87 15))
+; produces the sequence of all the ssn numbers in the tree
+; order traversal
+(define (inorder bt)
+  (cond
+    [(no-info? bt) '()]
+    [else
+     (append (inorder (node-left bt))
+             (list (node-ssn bt))
+             (inorder (node-right bt)))]))
+
+; BinaryTree -> List
+(check-expect (inorder2 bt1) (list 15 24))
+(check-expect (inorder2 bt2) (list 15 87))
+; produces the sequence of all the ssn numbers in the tree
+; pre-order traversal
+(define (inorder2 bt)
+  (cond
+    [(no-info? bt) '()]
+    [else
+     (cons (node-ssn bt)
+           (append (inorder2 (node-left bt))
+                   (inorder2 (node-right bt))))]))
+
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+; Exercise 325
+
+; Number BinarySearchTree -> String
+; determines whether a given number occurs in some given BT and returns the node's name
+(check-expect (search-bst 24 bt1) 'i)
+(check-expect (search-bst 15 bt2) 'd)
+(check-expect (search-bst 30 bt1) NONE)
+(define (search-bst n bst)
+  (cond
+    [(no-info? bst) NONE]
+    [(equal? n (node-ssn bst)) (node-name bst)]
+    [else
+     (if (< n (node-ssn bst))
+         (search-bst n (node-left bst))
+         (search-bst n (node-right bst)))]))
+
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+; Exercise 326
+
+; BinarySearchTree Number Symbol -> BinarySearchTree
+; (check-expect (create-bst (make-node 15 'd NONE (make-node 24 'i NONE NONE)) 17 'x) (make-node 15 'd (make-node 17 'x NONE NONE) (make-node 24 'i NONE NONE)))
+(define (create-bst bst num sym)
+  (cond
+    [(no-info? bst) (make-node num sym NONE NONE)]
+    [else
+     (if (< num (node-ssn bst))
+         (make-node (node-ssn bst)
+                    (node-name bst)
+                    (create-bst (node-left bst) num sym)
+                    (node-right bst))
+         (make-node (node-ssn bst)
+                    (node-name bst)
+                    (node-left bst)
+                    (create-bst (node-right bst) num sym)))]))
+
+; Not entirely sure if this works as it should... to me it looks like it returns a Binary Tree but not a Binary Search Tree
+; Checked with GPT-4 and it says that the function as it is defined should return a BST, not a BT
+
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+; Exercise 327
+
+; Not done yet

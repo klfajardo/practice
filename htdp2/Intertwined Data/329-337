@@ -1,0 +1,65 @@
+  ; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+; Exercise 329
+; 
+; How many times does a file name read! occur in the directory tree TS? 
+; - times
+; Can you describe the path from the root directory to the occurrences? 
+; - /TS/read!
+; - /TS/Libs/Docs/read!
+; What is the total size of all the files in the tree? 
+; - 10 + 99 + 52 + 17 + 19 + 2 + 8
+; What is the total size of the directory if each directory node has size 1? 
+; - 10 + 99 + 52 + 17 + 19 + 2 + 8 + 5
+; How many levels of directories does it contain?
+; - 5
+
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+; A Dir.v1 (short for directory) is one of: 
+; – '()
+; – (cons File.v1 Dir.v1)
+; – (cons Dir.v1 Dir.v1)
+ 
+; A File.v1 is a String.
+
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+; Exercise 330
+
+(define dirtree.v1 (list (list "Text" "part1" "part2" "part3") "read!" (list (list "Code" "hang" "draw") (list "read!"))))
+
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+; Exercise 331
+
+; Dir.v1 -> Number
+; Determines how many files a given Dir.v1 contains.
+(check-expect (how-many dirtree.v1) 9)
+(define (how-many directory)
+  (cond
+    [(empty? directory) 0] ; empty directory
+    [(string? (first directory)) (+ (how-many (rest directory)) 1)]
+    [else
+     (+ (how-many (first directory))
+        (how-many (rest directory)))]))
+
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+(define-struct dir [name content])
+; A Dir.v2 is a structure: 
+;   (make-dir String LOFD)
+ 
+; An LOFD (short for list of files and directories) is one of:
+; – '()
+; – (cons File.v2 LOFD)
+; – (cons Dir.v2 LOFD)
+ 
+; A File.v2 is a String.
+
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+; Exercise 332
+
+(define dirtree.v2 (make-dir "TS" (list (make-dir "Text" (list "part1" "part2" "part3")) "read!" (make-dir "Libs" (list (make-dir "Code" (list "hang" "draw")) (make-dir "Docs" (list "read")))))))
+
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+; Exercise 333
+
+In process...

@@ -1,8 +1,8 @@
-  ; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ; Exercise 329
 ; 
 ; How many times does a file name read! occur in the directory tree TS? 
-; - times
+; - 2 times
 ; Can you describe the path from the root directory to the occurrences? 
 ; - /TS/read!
 ; - /TS/Libs/Docs/read!
@@ -36,7 +36,7 @@
 (define (how-many directory)
   (cond
     [(empty? directory) 0] ; empty directory
-    [(string? (first directory)) (+ (how-many (rest directory)) 1)]
+    [(string? (first directory)) (+ (how-many (rest directory)) 1)] ; un archivo
     [else
      (+ (how-many (first directory))
         (how-many (rest directory)))]))
@@ -62,4 +62,76 @@
 ; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ; Exercise 333
 
-In process...
+; Dir.v2 -> Number
+; Determines how many files a given Dir.v2 contains.
+(check-expect (how-many.v2 dirtree.v2) 7)
+(define (how-many.v2 dir)
+  (foldl (lambda (x acc) (+ acc (if (string? x) 1 (how-many.v2 x))))
+         0 (dir-content dir)))
+
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+; Exercise 334
+
+(define-struct dir.v2.1 [name content size readibility])
+; A Dir.v2.1 is a structure: 
+;   (make-dir String LOFD Number String)
+ 
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+(define-struct file [name size content])
+; A File.v3 is a structure: 
+;   (make-file String N String)
+
+(define-struct dir.v3 [name dirs files])
+; A Dir.v3 is a structure: 
+;   (make-dir.v3 String Dir* File*)
+ 
+; A Dir* is one of: 
+; – '()
+; – (cons Dir.v3 Dir*)
+ 
+; A File* is one of: 
+; – '()
+; – (cons File.v3 File*)
+
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+; Exercise 335
+
+; (define dirtree.v3 (make-dir.v3 "TS" (list (make-dir.v3 "Text" (list (make-file "part1" 99 "") (make-file "part2" 52 "") (make-file "part3" 17 "")) '()) (make-dir.v3 "Libs" (list (make-dir.v3 "Code" '() (list (make-file "hang" 8 "") (make-file "draw" 2 ""))) (make-dir.v3 "Docs" '() (list (make-file "read!" 19 ""))))'())) (list (make-file "read!" 10 ""))))
+(define dirtree.v3 
+  (make-dir.v3 "TS" 
+    (list 
+      (make-dir.v3 "Text" '() (list (make-file "part1" 99 "") (make-file "part2" 52 "") (make-file "part3" 17 "")))
+      (make-dir.v3 "Libs" 
+        (list 
+          (make-dir.v3 "Code" '() (list (make-file "hang" 8 "") (make-file "draw" 2 "")))
+          (make-dir.v3 "Docs" '() (list (make-file "read!" 19 "")))
+        ) 
+        '()
+      )
+    ) 
+    (list (make-file "read!" 10 ""))
+  )
+)
+
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+; Exercise 336
+
+; Dir.v3 -> Number
+; Determines how many files a given Dir.v3 contains.
+(check-expect (how-many.v3 dirtree.v3) 7)
+(define (how-many.v3 dir)
+  (+ (length (dir.v3-files dir))
+             (foldl (lambda (x acc) (+ acc (how-many.v3 x)))
+                    0 (dir.v3-dirs dir))))
+
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+; Exercise 337
+
+(define-struct file [name size content])
+; A File.v4 is a structure: 
+;   (make-file String N String)
+
+(define-struct dir.v4 [name dirs files])
+; A Dir.v4 is a structure: 
+;   (make-dir.v4 String [List-of Dir] [List-of File])

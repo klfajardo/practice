@@ -1,0 +1,61 @@
+  (require htdp/dir)
+
+; String -> Dir.v3
+; creates a representation of the a-path directory 
+; (define (create-dir a-path) ...)
+
+; (define O (create-dir "/Users/...")) ; on OS X 
+(define L (create-dir "/home/sk/exerciseshtdp/")) ; on Linux
+; (define W (create-dir "C:\\Users\\...")) ; on Windows
+
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+; Exercise 338
+
+(define myDir (create-dir "/home/sk/exerciseshtdp/"))
+
+; Dir -> Number
+; Determines how many files a given Dir contains.
+(check-expect (how-many myDir) 30)
+(define (how-many d)
+  (+ (length (dir-files d))
+     (foldl (lambda (x acc) (+ acc (how-many x))) 0 (dir-dirs d))))
+
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+; Exercise 339
+
+; Dir String -> Boolean
+; determines whether or not a file with name occurs in the directory tree
+(check-expect (find? myDir "test.txt") #true)
+(define (find? dir name)
+  (or (ormap (lambda (x) (string=? (file-name x) name)) (dir-files dir))
+      (ormap (lambda (x) (find? x name)) (dir-dirs dir))))
+
+
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+; Exercise 340
+
+; Dir -> String
+; lists the names of all files and directories in a given Dir.
+; (check-expect (ls myDir) "")
+(define (ls dir)
+  (string-append
+   (foldr (lambda (x acc) (string-append acc "\n-- " (dir-name x)))
+          "" (dir-dirs dir))
+   (foldr (lambda (x acc) (string-append acc "\n- " (file-name x)))
+          "" (dir-files dir))))
+
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+; Exercise 341
+
+; Dir -> Number
+; computes the total size of all
+; the files in the entire directory tree.
+(check-expect (du myDir) 237519)
+(define (du dir)
+  (+ (foldr (lambda (x acc) (+ acc (file-size x))) 0 (dir-files dir))
+     (foldr (lambda (x acc) (+ acc 1 (du x))) 0 (dir-dirs dir))))
+
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+; Exercise 342
+
+; In process...

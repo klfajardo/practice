@@ -1,0 +1,126 @@
+(define-struct add [left right])
+(define-struct mul [left right])
+
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+; Exercise 345
+
+; An BSL-expr is one of:
+; – Num
+; – (Operator Num Num)
+; – (Operator Num BSL-expr)
+; – (Operator BSL-expr Num)
+; – (Operator BSL-expr BSL-expr)
+ 
+; An Operator is one of: 
+; – (make-add BSL-expr BSL-expr)
+; – (make-mul BSL-expr BSL-expr)
+
+(make-add 10 -10)
+(make-add (make-mul 20 3) 33)
+(make-add (make-mul 3.14 (make-mul 2 3)) (make-mul 3.14 (make-mul -1 -9)))
+
+(+ -1 2)
+(+ (* -2 -3) 33)
+(* (+ 1 (* 2 3)) 3.14)
+
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+; Exercise 346
+
+(define-struct div [top down])
+(define-struct subd [left right])
+
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+; Exercise 347
+
+; BSL-expr -> Number
+(check-expect (eval-expression 5) 5)
+(check-expect (eval-expression (make-add 10 -10)) 0)
+(check-expect (eval-expression (make-add (make-mul 20 3) 33)) 93)
+(define (eval-expression bsl-exp)
+  (cond
+    [(add? bsl-exp) (+ (eval-expression (add-left bsl-exp))
+                       (eval-expression (add-right bsl-exp)))]
+    [(mul? bsl-exp) (* (eval-expression (mul-left bsl-exp))
+                       (eval-expression (mul-right bsl-exp)))]
+    [else bsl-exp]))
+
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+; Exercise 348
+
+; An Bool-BSL-expr is one of: 
+; – Boolean
+; – (Operator Boolean Boolean)
+; – (Operator Boolean BSL-expr)
+; – (Operator BSL-expr Boolean)
+; – (Operator BSL-expr BSL-expr)
+ 
+; An Operator is one of: 
+; – (make-and BSL-expr BSL-expr)
+; – (make-or BSL-expr BSL-expr)
+
+(define-struct and-expr [left right])
+(define-struct or-expr [left right])
+
+; Bool-BSL-expr -> Boolean
+(check-expect (eval-bool-expression #false) #false)
+(check-expect (eval-bool-expression #true) #true)
+(check-expect (eval-bool-expression (make-and-expr #true #false)) #false)
+(check-expect (eval-bool-expression (make-and-expr #true #true)) #true)
+(check-expect (eval-bool-expression (make-or-expr #false #false)) #false)
+(check-expect (eval-bool-expression (make-or-expr #true #false)) #true)
+(define (eval-bool-expression bool-bsl-exp)
+  (cond
+    [(and-expr? bool-bsl-exp) (and (eval-bool-expression (and-expr-left bool-bsl-exp))
+                                   (eval-bool-expression (and-expr-right bool-bsl-exp)))]
+    [(or-expr? bool-bsl-exp) (or (eval-bool-expression (or-expr-left bool-bsl-exp))
+                                 (eval-bool-expression (or-expr-right bool-bsl-exp)))]
+    [else bool-bsl-exp]))
+
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+; Exercise 349-351
+
+(define WRONG "error: wrong expression")
+
+; Any -> Boolean
+; determines if the given thing is an atom
+(define (atom? x)
+  (or (string? x)
+      (number? x)
+      (symbol? x)))
+
+; S-expr -> BSL-expr
+(check-expect (parse 5) 5)
+(check-expect (parse '(+ 10 -10)) (make-add 10 -10))
+(check-expect (parse '(+ (* 20 3) 33)) (make-add (make-mul 20 3) 33))
+(define (parse s)
+  (cond
+    [(atom? s) (parse-atom s)]
+    [else (parse-sl s)]))
+ 
+; SL -> BSL-expr 
+(define (parse-sl s)
+  (local ((define L (length s)))
+    (cond
+      [(< L 3) (error WRONG)]
+      [(and (= L 3) (symbol? (first s)))
+       (cond
+         [(symbol=? (first s) '+)
+          (make-add (parse (second s)) (parse (third s)))]
+         [(symbol=? (first s) '*)
+          (make-mul (parse (second s)) (parse (third s)))]
+         [else (error WRONG)])]
+      [else (error WRONG)])))
+ 
+; Atom -> BSL-expr 
+(define (parse-atom s)
+  (cond
+    [(number? s) s]
+    [(string? s) (error WRONG)]
+    [(symbol? s) (error WRONG)]))
+
+; S-expr -> Value
+(check-expect (interpreter-expr 5) 5)
+(check-expect (interpreter-expr '(+ 10 -10)) 0)
+(check-expect (interpreter-expr '(+ (* 20 3) 33)) 93)
+(define (interpreter-expr s-expr)
+  (eval-expression (parse s-expr)))

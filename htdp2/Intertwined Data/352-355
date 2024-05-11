@@ -80,7 +80,7 @@
 (check-expect (eval-expression* (make-add 'a 'b) AL1) WRONG)
 (check-expect (eval-expression* (make-add (make-mul 20 'z) 33) AL1) 93)
 (define (eval-expression* ex da)
-  (eval-variable (foldr (lambda (x expr) (subst expr (first x) (second x))) ex da)))  ; esto deberia volver otra expresion...
+  (eval-variable (foldr (lambda (x expr) (subst expr (first x) (second x))) ex da)))
 
 ; esta definicion esta bien pero esta dando resultados incorrectos, debo revisar funciones de arriba
 ; aun no he terminado

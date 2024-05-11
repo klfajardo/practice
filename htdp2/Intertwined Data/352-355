@@ -1,0 +1,86 @@
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+; Exercise 352
+
+; A BSL-var-expr is one of: 
+; – Number
+; – Symbol 
+; – (make-add BSL-var-expr BSL-var-expr)
+; – (make-mul BSL-var-expr BSL-var-expr)
+
+; BSL-var-expr Symbol Number -> BSL-expr
+; Produces a BSL-var-expr like ex with all occurrences of x replaced by v.
+(check-expect (subst 'b 'b 10) 10)
+(check-expect (subst (make-add 5 'a) 'a 5) (make-add 5 5))
+(check-expect (subst (make-add (make-mul 2 'a) 'a) 'a 5) (make-add (make-mul 2 5) 5))
+(define (subst ex x v)
+  (local
+    ; Value -> BSL-var-expr
+    ; If e is a symbol, replaces it with v.
+    ; If e is a number, returns the same number.
+    ; If e is a BSL-var-expr, calls subst recursively.
+    ((define (check e)
+       (cond [(symbol? e) v]
+             [(or (add? e) (mul? e)) (subst e x v)] 
+             [else e])))
+    (cond
+      [(add? ex) (make-add (check (add-left ex)) (check (add-right ex)))]
+      [(mul? ex) (make-mul (check (mul-left ex)) (check (mul-right ex)))]
+      [else (check ex)])))
+
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+; Exercise 353
+
+; BSL-var-expr -> Boolean
+; determines whether a BSL-var-expr is also a BSL-expr. (Doesn't contain symbols)
+(check-expect (numeric? 'b) #false)
+(check-expect (numeric? 7) #true)
+(check-expect (numeric? (make-mul 'b (make-add 5 'z))) #false)
+(check-expect (numeric? (make-mul 3 (make-add 5 8))) #true)
+(check-expect (numeric? (make-mul (make-add 2 2) (make-add 5 8))) #true)
+(define (numeric? ex)
+  (local
+    ; Value -> Boolean
+    ; If e contains a symbol, returns #false.
+    ((define (check e)
+       (cond [(symbol? e) #false]
+             [(or (add? e) (mul? e)) (numeric? e)] 
+             [else #true])))
+    (cond
+      [(add? ex) (and (check (add-left ex)) (check (add-right ex)))]
+      [(mul? ex) (and (check (mul-left ex)) (check (mul-right ex)))]
+      [else (check ex)])))
+
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+; Exercise 354
+
+; BSL-var-expr -> Number or Error
+; determines its value if numeric? yields true for
+; the input. Otherwise it signals an error.
+(check-expect (eval-variable (make-add 5 5)) 10)
+(check-expect (eval-variable (make-add 'z 5)) WRONG)
+(define (eval-variable ex)
+  (if (numeric? ex) (eval-expression ex) WRONG))
+
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+; Exercise 355
+
+; An AL (short for association list) is [List-of Association].
+; An Association is a list of two items:
+;   (cons Symbol (cons Number '())).
+
+(define X (list 'x 1))
+(define Y (list 'y 2))
+(define Z (list 'z 3))
+(define AL1 (list X Y Z))
+
+; BSL-var-expr AL -> Number
+(check-expect (eval-expression* 5 AL1) 5)
+(check-expect (eval-expression* (make-add 10 -10) AL1) 0)
+(check-expect (eval-expression* (make-add 'x 'z) AL1) 4)
+(check-expect (eval-expression* (make-add 'a 'b) AL1) WRONG)
+(check-expect (eval-expression* (make-add (make-mul 20 'z) 33) AL1) 93)
+(define (eval-expression* ex da)
+  (eval-variable (foldr (lambda (x expr) (subst expr (first x) (second x))) ex da)))  ; esto deberia volver otra expresion...
+
+; esta definicion esta bien pero esta dando resultados incorrectos, debo revisar funciones de arriba
+; aun no he terminado

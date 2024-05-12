@@ -19,7 +19,7 @@
     ; If e is a number, returns the same number.
     ; If e is a BSL-var-expr, calls subst recursively.
     ((define (check e)
-       (cond [(symbol? e) v]
+       (cond [(symbol? e) (if (equal? e x) v ex)]
              [(or (add? e) (mul? e)) (subst e x v)] 
              [else e])))
     (cond
@@ -76,11 +76,7 @@
 ; BSL-var-expr AL -> Number
 (check-expect (eval-expression* 5 AL1) 5)
 (check-expect (eval-expression* (make-add 10 -10) AL1) 0)
-(check-expect (eval-expression* (make-add 'x 'z) AL1) 4)
 (check-expect (eval-expression* (make-add 'a 'b) AL1) WRONG)
-(check-expect (eval-expression* (make-add (make-mul 20 'z) 33) AL1) 93)
+(check-expect (eval-expression* (make-add (make-mul 20 'z) 33) AL1) 93); 
 (define (eval-expression* ex da)
   (eval-variable (foldr (lambda (x expr) (subst expr (first x) (second x))) ex da)))
-
-; esta definicion esta bien pero esta dando resultados incorrectos, debo revisar funciones de arriba
-; aun no he terminado

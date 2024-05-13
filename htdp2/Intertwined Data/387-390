@@ -1,0 +1,135 @@
+; [List-of Number] [List-of Number] -> [List-of Number]
+; replaces the final '() in front with end
+(check-expect (replace-eol-with '() '(a b)) '(a b))
+(check-expect (replace-eol-with (cons 1 '()) '(a))
+              (cons 1 '(a)))
+(check-expect (replace-eol-with
+               (cons 2 (cons 1 '())) '(a))
+              (cons 2 (cons 1 '(a))))
+(define (replace-eol-with front end)
+  (cond
+    [(empty? front) end]
+    [else
+     (cons (first front)
+           (replace-eol-with (rest front) end))]))
+
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+; Exercise 387
+
+; [List-of Symbol] [List-of Number] -> [List-of Tuple]
+; produces all possible ordered pairs of symbols and numbers
+(check-expect (cross '(a b c) '(1 2) ) '((a 1) (a 2) (b 1) (b 2) (c 1) (c 2)))
+(define (cross alos alon)
+  (cond
+    [(empty? alos) '()]
+    [else
+     (append (map (lambda (num) (list (first alos) num)) alon)
+             (cross (rest alos) alon))]))
+
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+; Exercise 388
+
+(define-struct employee [name ssn pay-rate])
+; A employee is a structure: 
+;   (make-employee String Number Number)
+; where name is the employee's name, ssn is the social security
+; number, and pay-rate is the hourly pay rate.
+
+(define-struct work-record [employee-name hours])
+; A work-record is a structure: 
+;   (make-work-record String Number)
+; where `employee-name` is the name of the employee and
+; hours is the number of hours worked.
+
+; [List-of Employees]
+(define employees
+  (list
+   (make-employee "Akira Tendo" 123456789 25.00)
+   (make-employee "Shizuka Mikazuki" 987654321 30.00)
+   (make-employee "Kenichiro Ryuzaki" 192837465 27.50)))
+
+; [List-of Work-Records]
+(define work-records
+  (list
+   (make-work-record "Akira Tendo" 60)
+   (make-work-record "Shizuka Mikazuki" 38)
+   (make-work-record "Kenichiro Ryuzaki" 42)))
+
+; [List-of employee] [List-of work-record] -> [List-of Tuple]
+; multiplies the corresponding items on hours and wages/h 
+; assume the two lists are of equal length
+(check-expect (wages*.v2 employees work-records)
+              (list
+               (list "Akira Tendo" (* 25.00 60))         ; 1500.0
+               (list "Shizuka Mikazuki" (* 30.00 38))    ; 1140.0
+               (list "Kenichiro Ryuzaki" (* 27.50 42)))) ; 1155.0
+(define (wages*.v2 aloe alowr)
+  (cond
+    [(empty? aloe) '()]
+    [else
+     (cons
+      (weekly-wage (first aloe) (first alowr))
+      (wages*.v2 (rest aloe) (rest alowr)))]))
+
+; Number Number -> List
+; computes the weekly wage from pay-rate and hours
+(define (weekly-wage e wr)
+  (list (employee-name e)
+        (* (employee-pay-rate e)
+           (work-record-hours wr))))
+
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+; Exercise 389
+
+(define-struct phone-record [name number])
+; A PhoneRecord is a structure:
+;   (make-phone-record String String)
+
+(define phones-list (list "1111-1111" "2222-2222" "3333-3333"))
+(define names-list (list "user1" "user2" "user3"))
+
+; [List-of Names] [List-of Phones] -> [List-of Tuples]
+(check-expect 
+ (zip names-list phones-list)
+ (list (list "user1" "1111-1111")
+       (list "user2" "2222-2222")
+       (list "user3" "3333-3333")))
+(define (zip names phones)
+  (cond
+    [(empty? names) '()]
+    [else
+     (cons
+      (list (first names) (first phones))
+      (zip (rest names) (rest phones)))]))
+
+; I forgot to use the phone-record structure... and returned instead Tuples O_o
+
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+; Exercise 390
+
+(define-struct branch [left right])
+ 
+; A TOS (shorten for Tree of Symbols) is one of:
+; – Symbol
+; – (make-branch TOS TOS)
+(define a-tos (make-branch (make-branch (make-branch 'a 'b) (make-branch 'c 'd)) (make-branch 'f 'g)))
+ 
+; A Direction is one of:
+; – 'left
+; – 'right
+
+; A list of Directions is also called a path.
+
+; [Tree-of Symbol] [List-of Direction] -> Symbol
+; Navigates through a TOS based on a list of directions (a path)
+(check-expect (tree-pick a-tos (list 'left 'right 'left)) 'c)
+(define (tree-pick tos path)
+  (cond
+    [(and (symbol? tos) (empty? path)) tos]
+    [(and (symbol? tos) (not (empty? path))) (error "Invalid path: Non-empty path given with a symbol leaf.")]
+    [(and (empty? path) (branch? tos)) (error "Invalid path: Reached a branch with no directions left.")]")]
+    [(branch? tos)
+     (tree-pick (if (equal? (first path) "left")
+                    (branch-left tos)
+                    (branch-right tos)) (rest path))]))
+                    

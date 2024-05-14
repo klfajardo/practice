@@ -1,0 +1,59 @@
+  ; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+; Exercise 391
+
+; N is one of: 
+; – 0
+; – (add1 N)
+
+; TABLE - - - - - - - - - - -
+;            f r o n t
+; e         empty? cons?
+; n  empty?   1     3
+; d   cons?   2     4
+
+; [List-of Number] [List-of Number] -> [List-of Number]
+; replaces the final '() in front with end
+(check-expect (replace-eol-with (cons 1 '()) '()) (cons 1 '()))
+(check-expect (replace-eol-with '() (cons 1 '())) (cons 1 '()))
+(check-expect (replace-eol-with '() (cons 1 (cons 2 '()))) (cons 1 (cons 2 '())))
+(check-expect (replace-eol-with (cons 1 '()) (cons 2 '())) (cons 1 (cons 2 '())))
+(define (replace-eol-with front end)
+  (cond
+    [(and (empty? front) (empty? end)) '()] ; 1
+    [(and (empty? front) (cons? end)) end] ; 2
+    [(and (cons? front) (empty? end)) front] ; 3
+    [(and (cons? front) (cons? end))
+     (cons (first front)
+           (replace-eol-with (rest front) end))])) ; 4
+
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+; Exercise 392
+
+(define-struct branch [left right])
+ 
+; A TOS (shorten for Tree of Symbols) is one of:
+; – Symbol
+; – (make-branch TOS TOS)
+(define a-tos (make-branch (make-branch (make-branch 'a 'b) (make-branch 'c 'd)) (make-branch 'f 'g)))
+ 
+; A Direction is one of:
+; – 'left
+; – 'right
+
+; A list of Directions is also called a path.
+
+(define ERROR "there is a error.")
+
+; [Tree-of Symbol] [List-of Direction] -> Symbol
+; Navigates through a TOS based on a list of directions (a path)
+(check-expect (tree-pick a-tos (list 'left 'right 'left)) 'c)
+(define (tree-pick tos path)
+  (cond
+    [(symbol? tos)
+     (if (empty? path) tos ERROR)]
+    [(branch? tos)
+     (if (empty? path) ERROR
+         (tree-pick (if (equal? (first path) 'left)
+                        (branch-left tos)
+                        (branch-right tos)) (rest path)))]))
+                        

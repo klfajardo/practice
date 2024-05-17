@@ -1,0 +1,207 @@
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### Lesson 1
+
+# Exercise
+print("1. Mix 500g of Flour, 10g Yeast and 300ml Water in a bowl.")
+print("2. Knead the dough for 10 minutes.")
+print("3. Add 3g of Salt.")
+print("4. Leave to rise for 2 hours.")
+print("5. Bake at 200 degrees C for 30 minutes.\n")
+
+# Different woys to use quotes within Strings
+# String modifiers
+print("A 'single quote' inside a double quote")
+print('A "double quote" inside a single quote')
+print("Alternatively you can just \"escape\" the quote\n")
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### Lesson 2
+
+# Different ways to print "Hello world!" three times.
+print("Hello world!")
+print("Hello world!")
+print("Hello world!\n")
+
+print("Hello world!\nHello world!\nHello world!\n")
+
+print("Hello world!\n" * 3)
+
+# How 2 Concatenate
+print("Hello" + "World")
+  
+print("Hello " + "World")
+print("Hello" + " World")
+print("Hello" + " " + "World\n")
+
+
+# Exercise
+# Debug and fix this code:
+
+# print(Day 1 - String Manipulation")
+# print("String Concatenation is done with the "+" sign.")
+#     print ('e.g. print("Hello " + Wworld")')
+# print(("New lines can be created with a backslah and n.")
+
+print("Day 1 - String Manipulation")
+print('String Concatenation is done with the "+" sign.')
+print('e.g. print("Hello " + "world")')
+print("New lines can be created with a backslash and n.\n")
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### Lesson 3
+
+# To comment out a line add a hashtag/pound sign (#)
+# Add comments to every line of code so that you can
+# - understand, document, and have notes for future reference
+
+# Command + / (Mac)  OR  Ctrl + / (Win)
+# To comment out a line
+
+# Print the string "What is your name?"
+# User cannot insert input
+print("What is your name?")
+
+# Print the string/prompt "What is your name?"
+# And user will be able to insert input
+# the input function will be replaced by the input data the user inserted
+# the input function will be replaced by the input data inserted by the user
+# syntax: input(prompt)
+input("What is your name?")
+
+# input() will get user input in console
+# Then print() will print the word "Hello" and the user input (using concatenation)
+print("Hello " + input("What is your name?\n"))
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# Exercise
+# The instructor is using Auditorium to test the definitions,
+# but I would like to try some unit testing directly to emulate "check-expects" from Scheme / HTDP2
+
+import io
+import sys
+
+# Input -> String
+# input() will get user input in console
+# Then print() will print the word "Hello" and the user input
+def greet_user():
+    print("Hello " + input("What is your name?"))
+
+def test_greet_user():
+    # Simulates user input
+    test_cases = [
+        ("Kevin\n", "What is your name?Hello Kevin\n"),
+        ("Pepe\n", "What is your name?Hello Pepe\n"),
+        ("Rodrigo\n", "What is your name?Hello Rodrigo\n")
+    ]
+
+    for user_input, expected_output in test_cases:
+        # Redirect stdin and stdout
+        sys.stdin = io.StringIO(user_input)
+        sys.stdout = io.StringIO()
+
+        # Calls the function to be tested
+        greet_user()
+        
+        # Captures the output
+        output = sys.stdout.getvalue()
+
+        # Restore stdin and stdout
+        sys.stdin = sys.__stdin__
+        sys.stdout = sys.__stdout__
+
+        # Verifies the output
+        assert output == expected_output, f"Expected: {expected_output}, but got: {output}"
+        print("Test passed!") 
+      
+    # If all tests passed successfully
+    print("All tests ran successfully!")
+
+test_greet_user()
+
+# Improvements: I could add an integer that counts the number of tests passed and tests failed, like in Scheme
+#               Replicate that output from check-expects
+#               And abstract this function, so that I can use it frequently
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# Num Num -> Number
+# Multiplies 2 numbers entered by the user.
+def multiply_input():
+    num1 = int(input())
+    num2 = int(input())
+    print(num1 * num2)
+
+def test_multiply_input():
+    test_cases = [
+        (["2\n", "3\n"], "6\n"),
+        (["5\n", "5\n"], "25\n"),
+    ]
+
+    for user_input, expected_output in test_cases:
+        # Redirect stdin and stdout
+        sys.stdin = io.StringIO(''.join(user_input))
+        sys.stdout = io.StringIO()
+
+        # Calls the function to be tested
+        multiply_input()
+
+        # Captures the output
+        output = sys.stdout.getvalue()
+        
+        # Restores stdin and stdout
+        sys.stdin = sys.__stdin__
+        sys.stdout = sys.__stdout__
+
+        # Verifies
+        assert output == expected_output, f"Expected: {expected_output}, but got: {output}"
+
+test_multiply_input()
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# String -> Number
+# Counts the number of letters in the given word.
+def num_of_letters():
+    name = input()
+    num_letters = len(name)
+    print(f"Word: {name}, letters: {num_letters}")
+
+def test_num_of_letters():
+    test_cases = [
+        ("\n", "Word: , letters: 0\n"),
+        ("hello\n", "Word: hello, letters: 5\n"),
+        ("world \n", "Word: world , letters: 6\n")
+    ]
+
+    for user_input, expected_output in test_cases:
+        # Redirect stdin and stdout
+        sys.stdin = io.StringIO(user_input)
+        sys.stdout = io.StringIO()
+
+        # Calls the function to be tested
+        num_of_letters()
+
+        # Captures the output
+        output = sys.stdout.getvalue()
+
+        # Restore stdin and stdout
+        sys.stdin = sys.__stdin__
+        sys.stdout = sys.__stdout__
+
+        # Verifies the output
+        assert output == expected_output, f"Expected: {expected_output}, but got: {output}"
+        print("Test passed!")
+    print("All tests ran successfully!")
+
+test_num_of_letters()
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+I still have more videos pending from day 1...
+        
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# Refs:
+# https://www.w3schools.com/python/ref_string_join.asp
+# https://stackoverflow.com/questions/52119941/simple-unit-test-in-python-to-check-input-and-expected-output
+# https://stackoverflow.com/questions/961632/convert-integer-to-string-in-python

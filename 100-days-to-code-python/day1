@@ -197,11 +197,80 @@ test_num_of_letters()
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-I still have more videos pending from day 1...
-        
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
 # Refs:
 # https://www.w3schools.com/python/ref_string_join.asp
 # https://stackoverflow.com/questions/52119941/simple-unit-test-in-python-to-check-input-and-expected-output
 # https://stackoverflow.com/questions/961632/convert-integer-to-string-in-python
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# VARIABLES
+
+# Once we run this program, the input data the function receives, kinda disappears (is stored nowhere)
+input("\nWhat is your name?")
+
+# This is where variables comes very in-handy
+# Assigns whatever input this funtion/prompt receives, in a variable
+name = input("What is your name?")
+
+# I can use this variable at any point in my code just by refering
+# to "name" that is attached to the input's value.'
+print(name)
+
+# Variables are mutable. We can modify their values after defining them for the first time.
+name = "Jack"
+print(name)
+
+name = "Angela"
+print(name)
+
+# We could take this line from before: print(len(input()))
+
+# And make it more legible/readable, and split it into steps and variables
+name = input()
+length = len(name)
+print(length)
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# LESSON 4 DAY 1 - VARIABLES
+# For now I will not continue doing my own unit testing XD at least in these exercises
+
+# There are two variables, a and b from input
+a = input()
+b = input()
+# 🚨 Don't change the code above ☝️
+####################################
+# Write your code below this line 👇
+
+c = a
+a = b
+b = c
+
+# 🚨 Don't change the code below 👇
+print("a: " + a)
+print("b: " + b)
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# Naming variables
+
+# Rules:
+# - readable
+# - one single unit / word
+
+# You can:
+# - have multiple words in a variable name, by separating them with _
+# - have numbers at the end of variable names
+# - avoid using special keywords (e.g input, or print, or practice) -> Not syntax issue,but bad practice
+# - use whatever word you want, as long as they are consistent through the code
+
+# You can't:
+# - have spaces betweem the words
+# - have numbers at the beginning of the variable name -> Syntax error
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# PROJECT - Band Name Generator
+
+print("Welcome to the Band Name Generator.")
+city = input("What's the name of the city you grew up in?\n")
+pet = input("What's your pet's name?\n")
+print("Your band name could be " + city + " " + pet + ".")
